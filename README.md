@@ -1,73 +1,55 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+Express 바탕의 Node.js의 프레임워크
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+cmd에서 npm i -g @nestjs/cli 를 입력해서 Nestjs CLI 설치
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+클래스에 기능을 추가하는 데코레이터(함수 형태) - Spring의 Annotation과 비슷한 역할
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+```tsx
+// app.module.ts
+@Module({
+  imports: [MoviesModule],
+  controllers: [AppController],
+  providers: [AppService], //Dependency Injection이 일어나는 부분, Injectable Decorator
+})
 ```
 
-## Running the app
+@Get, @Post 등 Method 경로에 :name 형태로 쿼리, 파라미터 추출 가능
 
-```bash
-# development
-$ npm run start
+@Query(’name’), @Param(’name’), @Body()
 
-# watch mode
-$ npm run start:dev
+Controller의 역할은 URL과 Service의 Business 로직(함수)를 연결시켜주는 것에서 끝
 
-# production mode
-$ npm run start:prod
+validation을 위해 설치
+
+npm i class-validator class-transformer 
+
+```tsx
+// main.ts
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, // decorator가 없다면 걸러질 것
+    forbidNonWhitelisted: true, // whiltelist에 걸렸다면 요청 자체를 막음
+    transform: true, // controller에서 명시한 타입으로 변환
+  }));
 ```
 
-## Test
+타입 변환(PartialType 함수 사용)을 위해 설치
 
-```bash
-# unit tests
-$ npm run test
+npm i @nestjs/mapped-types
 
-# e2e tests
-$ npm run test:e2e
+Entity → 데이터베이스와 매핑되는 객체, 비즈니스 로직에 사용되기도 함
 
-# test coverage
-$ npm run test:cov
-```
+DTO → 컨트롤러와 서비스간의 데이터 전달에 사용, 비즈니스 로직에 사용되지 않음
 
-## Support
+# Testing
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+jest → npm의 Javascript 테스팅 패키지, spec.ts 파일을 찾아서 테스트 
 
-## Stay in touch
+Unit Testing → 서비스에서 분리된 유닛을 테스트 describe(문단), it(문장) → 함수를 호출해서 원하는 값이 나오는지 테스트함.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/ede7a07b-7763-4831-ad5d-0806131219aa/ccb739c2-ec74-4760-8686-c2a9757015f9/image.png)
 
-## License
+E2E Testing → 서비스 전체의 흐름을 처음부터 끝까지 테스트 → 요청을 통해 원하는 값이 나오는지 테스트함.
 
-Nest is [MIT licensed](LICENSE).
+테스팅 환경과 실제 구동 환경이 다를 수 있음(main.ts의 GlobalPipe)
+
+test:e2e
